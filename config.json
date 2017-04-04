@@ -22,6 +22,16 @@
             }
         },
         {
+            "name": "Wetterdaten",
+            "symbol": "sun-o",
+            "type": "weather",
+            "scrollBox": false,
+            "data": {
+                "url": "https://dev.ffggrz.de/sunzi/start-dev/weather.json",
+                "updateInterval": 30
+            }
+        },
+        {
             "name": "Community Feed",
             "symbol": "rss",
             "type": "feed",

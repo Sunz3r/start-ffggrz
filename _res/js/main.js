@@ -139,6 +139,9 @@ app.sidebar = {
         case 'feed':
           self.feed.init(y)
           break
+        case 'weather':
+          self.weather.init(y)
+          break
       }
     })
   },
@@ -271,6 +274,50 @@ app.sidebar.feed = {
 
     return out
   }
+}
+
+app.sidebar.weather = {
+  data: {
+    temp: 0,
+    humidity: 0,
+    pressure: 0,
+  },
+
+  init: function (item) {
+    var target = '#' + item.type + ' .panel-body'
+
+    $.post('./_res/cgi/proxy.php', {url: '' + item.data.url + ''})
+      .done(function (data) {
+        var weatherTmp = {}
+        weatherTmp.temp = data.list[0].main.temp
+        weatherTmp.humidity = data.list[0].main.humidity
+        weatherTmp.pressure = data.list[0].main.pressure
+
+        if (app.sidebar.weather.data !== weatherTmp) {
+          $(target).empty()
+          var html = app.sidebar.weather.createItem(weatherTmp)
+          $(html).appendTo(target)
+          app.sidebar.weather.data = weatherTmp
+        }
+      })
+      .fail(function (j, s, e) {
+        console.log('Request failed (' + item.type + '): ' + s + ', ' + e)
+      })
+
+    setTimeout(function () { app.sidebar.weather.init(item) }, item.data.updateInterval * 1000)
+  },
+
+  createItem: function (data) {
+    var out = '' +
+      '<table class="table-condensed" style="width:100%">\n' +
+      '    <tr><td>Temperatur:</td><td class="text-right">' + parseFloat(data.temp).toFixed(1) + ' &#x00b0;C</td></tr>\n' +
+      '    <tr><td>Luftfeuchtigkeit:</td><td class="text-right">' + parseFloat(data.humidity).toFixed(0)  + ' %</td></tr>\n' +
+      '    <tr><td>Luftdruck:</td><td class="text-right">' + parseFloat(data.pressure).toFixed(0)  + ' hPa</td></tr>\n' +
+      '</table>'
+
+    return out
+  }
+
 }
 
 app.community = {
